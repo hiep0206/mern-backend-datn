@@ -1,0 +1,9 @@
+# Bỏ qua thư viện tải về (Render sẽ tự chạy npm install để tải lại)
+node_modules/
+
+# Bỏ qua file chứa mật khẩu, API Key bảo mật
+.env
+
+# Bỏ qua các file log hoặc cấu hình hệ điều hành
+npm-debug.log
+.DS_Store
