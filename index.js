@@ -7,7 +7,14 @@ const connectDB = require('./config/database');
 const reportController = require('./src/presentation/controllers/report_controller');
 
 const app = express();
-app.use(cors());
+
+// Cấu hình CORS tối ưu cho phép cả Vercel và Localhost truy cập
+app.use(cors({
+    origin: ['https://mern-frontend-datn.vercel.app', 'http://localhost:3000', 'http://localhost:5173'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // MỞ RỘNG GIỚI HẠN LÊN 50MB ĐỂ CHUYỂN ĐƯỢC DỮ LIỆU LỚN
 app.use(express.json({ limit: '50mb' }));
@@ -20,7 +27,8 @@ app.get('/', (req, res) => {
   res.send('API App Quản lý Tài chính đã chuyển đổi hoàn toàn sang kiến trúc mới!');
 });
 
-// Định tuyến API (Ngắn gọn, sạch sẽ)
+// Định tuyến API (Đưa route auth lên đây để đảm bảo server nhận diện chính xác)
+app.use('/api/auth', require('./src/presentation/routes/auth_routes'));
 app.use('/api/transactions', require('./src/presentation/routes/transaction_routes'));
 app.use('/api/insights', require('./src/presentation/routes/ai_routes'));
 app.use('/api/borrows', require('./src/presentation/routes/borrow_routes')); // API Sổ theo dõi mượn trả
@@ -32,4 +40,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
 });
-app.use('/api/auth', require('./src/presentation/routes/auth_routes'));
