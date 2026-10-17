@@ -5,6 +5,7 @@ const connectDB = require('./config/database');
 
 // Khai báo controller báo cáo thống kê cho biểu đồ
 const reportController = require('./src/presentation/controllers/report_controller');
+const authMiddleware = require('./src/presentation/middlewares/auth_middleware');
 
 const app = express();
 
@@ -34,7 +35,7 @@ app.use('/api/insights', require('./src/presentation/routes/ai_routes'));
 app.use('/api/borrows', require('./src/presentation/routes/borrow_routes')); // API Sổ theo dõi mượn trả
 
 // Thêm đường dẫn API lấy dữ liệu biểu đồ thống kê cho Frontend
-app.get('/api/v1/reports/monthly', reportController.getMonthlyReport);
+app.get('/api/v1/reports/monthly', authMiddleware, reportController.getMonthlyReport);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
