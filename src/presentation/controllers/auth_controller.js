@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             { id: user._id }, 
             process.env.JWT_SECRET || 'datn_finance_secret_key_2026', 
-            { expiresIn: '1d' }
+            { expiresIn: '365d' } // Đã tăng hạn mức lên 1 năm
         );
 
         res.status(200).json({
