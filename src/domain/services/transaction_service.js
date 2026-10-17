@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Transaction = require('../models/Transaction');
+const { VALID_TYPES } = require('../../core/constants/transaction_types');
 
-const VALID_TYPES = new Set(['income', 'expense']);
+const VALID_TYPE_SET = new Set(VALID_TYPES);
 
 function httpError(message, statusCode = 400) {
   const error = new Error(message);
@@ -25,7 +26,7 @@ function normalizeTransactionInput(input = {}, { partial = false } = {}) {
   }
 
   if (!partial || input.type !== undefined) {
-    if (!VALID_TYPES.has(input.type)) {
+    if (!VALID_TYPE_SET.has(input.type)) {
       throw httpError('Loại giao dịch phải là income hoặc expense.');
     }
     normalized.type = input.type;
