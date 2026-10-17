@@ -64,13 +64,6 @@ exports.forgotPassword = async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: 'Email chưa được đăng ký trong hệ thống!' });
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        user.resetPasswordOtp = otp;
-        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
-        await user.save();
-
-        // ĐÃ THAY THẾ HOÀN CHỈNH Ở ĐÂY
         const smtpUser = process.env.SMTP_USER;
         const smtpAppPassword = process.env.SMTP_APP_PASSWORD;
 
@@ -81,6 +74,13 @@ exports.forgotPassword = async (req, res) => {
             });
         }
 
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        user.resetPasswordOtp = otp;
+        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+        await user.save();
+
+        // ĐÃ THAY THẾ HOÀN CHỈNH Ở ĐÂY
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
