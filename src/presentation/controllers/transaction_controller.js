@@ -1,43 +1,65 @@
-const Transaction = require('../../domain/models/Transaction'); // Đường dẫn model của bạn
+const transactionService = require('../../domain/services/transaction_service');
 
 // Thêm giao dịch mới (Gắn với user đang đăng nhập)
 exports.createTransaction = async (req, res) => {
     try {
-        const { amount, type, category, note } = req.body;
-        const newTransaction = new Transaction({
-            userId: req.user.id, // 👈 Lấy ID từ token xác thực
-            amount,
-            type,
-            category,
-            note
-        });
-        await newTransaction.save();
-        res.status(201).json(newTransaction);
+        const transaction = await transactionService.createTransaction(req.user?.id, req.body);
+        res.status(201).json(transaction);
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(error.statusCode || 500).json({
+            message: error.message || 'Lỗi server'
+        });
     }
 };
 
 // Lấy danh sách giao dịch (Chỉ lấy của đúng user đang đăng nhập)
 exports.getTransactions = async (req, res) => {
     try {
-        const transactions = await Transaction.find({ userId: req.user.id }).sort({ createdAt: -1 });
+        const transactions = await transactionService.listTransactions(req.user?.id);
         res.status(200).json(transactions);
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(error.statusCode || 500).json({
+            message: error.message || 'Lỗi server'
+        });
     }
 };
 
-// Xóa giao dịch (Kiểm tra quyền sở hữu trước khi xóa)
+// Cập nhật giao dịch (Kiểm tra quyền sở hữu trước khi xóa)
+exports.updateTransaction = async (req, res) => {
+    try {
+        const transaction = await transactionService.updateTransaction(
+            req.user?.id,
+            req.params.id,
+            req.body
+        );
+        res.status(200).json(transaction);
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            message: error.message || 'Lỗi server'
+        });
+    }
+};
+
+// Xóa giao dịch
 exports.deleteTransaction = async (req, res) => {
     try {
-        const transaction = await Transaction.findOne({ _id: req.params.id, userId: req.user.id });
-        if (!transaction) {
-            return res.status(404).json({ message: 'Không tìm thấy giao dịch hoặc không có quyền xóa!' });
+        const deleted = await transactionService.deleteTransaction(
+            req.user?.id,
+            req.params.id
+        );
+
+        if (!deleted) {
+            return res.status(404).json({
+                message: 'Không tìm thấy giao dịch hoặc không có quyền xóa.'
+            });
         }
-        await transaction.deleteOne();
-        res.status(200).json({ message: 'Đã xóa giao dịch thành công!' });
+
+        return res.status(200).json({
+            message: 'Đã xóa giao dịch thành công!'
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        return res.status(error.statusCode || 500).json({
+            message: error.message || 'Lỗi server'
+        });
     }
 };
