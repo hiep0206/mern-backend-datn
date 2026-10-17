@@ -1,6 +1,7 @@
 const User = require('../../domain/models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { getJwtSecret } = require('../../../config/security');
 const nodemailer = require('nodemailer');
 
 // 1. ĐĂNG KÝ
@@ -41,7 +42,7 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign(
             { id: user._id }, 
-            process.env.JWT_SECRET || 'datn_finance_secret_key_2026', 
+            getJwtSecret(), 
             { expiresIn: '365d' } // Đã tăng hạn mức lên 1 năm
         );
 
@@ -70,16 +71,26 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         // ĐÃ THAY THẾ HOÀN CHỈNH Ở ĐÂY
+        const smtpUser = process.env.SMTP_USER;
+        const smtpAppPassword = process.env.SMTP_APP_PASSWORD;
+
+        if (!smtpUser || !smtpAppPassword) {
+            return res.status(503).json({
+                success: false,
+                message: 'Chức năng khôi phục mật khẩu chưa được cấu hình SMTP.'
+            });
+        }
+
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'conghiepkrb@gmail.com',
-                pass: 'iohr rrds tmfm pazb' // <-- BẠN CHỈ CẦN XÓA DÒNG CHỮ NÀY VÀ DÁN MÃ VÀO
+                user: smtpUser,
+                pass: smtpAppPassword
             }
         });
 
         const mailOptions = {
-            from: '"Trợ lý Tài chính AI" <no-reply@financeapp.com>',
+            from: `"Moneo" <${smtpUser}>`,
             to: user.email,
             subject: 'Mã xác nhận khôi phục mật khẩu',
             html: `<h3>Xin chào ${user.username},</h3>
