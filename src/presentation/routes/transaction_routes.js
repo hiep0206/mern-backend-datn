@@ -8,6 +8,7 @@ router.use(authMiddleware); // Yêu cầu đăng nhập cho tất cả các rout
 
 router.post('/', transactionController.createTransaction);
 router.get('/', transactionController.getTransactions);
+router.put('/:id', transactionController.updateTransaction);
 router.delete('/:id', transactionController.deleteTransaction);
 
 module.exports = router;
