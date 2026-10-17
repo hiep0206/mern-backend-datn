@@ -13,6 +13,6 @@ const transactionSchema = new mongoose.Schema({
   note: { type: String },
   isAiGenerated: { type: Boolean, default: false }, 
   date: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Transaction', transactionSchema);
