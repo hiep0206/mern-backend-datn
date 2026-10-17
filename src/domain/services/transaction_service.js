@@ -51,9 +51,22 @@ function normalizeTransactionInput(input = {}, { partial = false } = {}) {
     } else {
       const value = String(input.date);
       // Date input sends YYYY-MM-DD. Store midnight UTC for a stable calendar date.
-      const parsedDate = /^\d{4}-\d{2}-\d{2}$/.test(value)
-        ? new Date(`${value}T00:00:00.000Z`)
-        : new Date(value);
+      let parsedDate;
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        const [year, month, day] = value.split('-').map(Number);
+        parsedDate = new Date(Date.UTC(year, month - 1, day));
+
+        if (
+          parsedDate.getUTCFullYear() !== year ||
+          parsedDate.getUTCMonth() !== month - 1 ||
+          parsedDate.getUTCDate() !== day
+        ) {
+          throw httpError('Ngày giao dịch không hợp lệ.');
+        }
+      } else {
+        parsedDate = new Date(value);
+      }
 
       if (Number.isNaN(parsedDate.getTime())) {
         throw httpError('Ngày giao dịch không hợp lệ.');
