@@ -1,16 +1,35 @@
 const jwt = require('jsonwebtoken');
+const { getJwtSecret } = require('../../../config/security');
 
 module.exports = (req, res, next) => {
-    // Lấy token từ header của request
-    const token = req.header('Authorization');
-    if (!token) return res.status(401).json({ success: false, message: 'Từ chối truy cập! Chưa có token.' });
+  const authorization = req.header('Authorization');
 
-    try {
-        // Giải mã token để lấy ID người dùng
-        const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET || 'datn_finance_secret_key_2026');
-        req.user = decoded; // Gắn thông tin user vào request để các hàm sau sử dụng
-        next(); // Cho phép đi tiếp
-    } catch (err) {
-        res.status(401).json({ success: false, message: 'Token không hợp lệ hoặc đã hết hạn!' });
-    }
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return res.status(401).json({
+      success: false,
+      message: 'Từ chối truy cập! Vui lòng đăng nhập.'
+    });
+  }
+
+  let secret;
+  try {
+    secret = getJwtSecret();
+  } catch (error) {
+    console.error('[Security] JWT_SECRET chưa được cấu hình an toàn.');
+    return res.status(500).json({
+      success: false,
+      message: 'Máy chủ chưa được cấu hình khóa xác thực an toàn.'
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(authorization.slice(7).trim(), secret);
+    req.user = decoded;
+    return next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: 'Token không hợp lệ hoặc đã hết hạn!'
+    });
+  }
 };
