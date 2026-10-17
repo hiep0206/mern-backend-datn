@@ -17,7 +17,9 @@ Never commit `.env`, real API keys, SMTP passwords, or production connection str
 
 - `config/`: infrastructure and security configuration.
 - `src/domain/models/`: Mongoose persistence models.
+- `src/core/constants/`: shared domain-independent constants.
 - `src/domain/services/`: business operations and validation independent of HTTP request/response objects.
+- `src/ai_engine/`: AI use cases and model integration, called by thin presentation controllers.
 - `src/presentation/controllers/`: HTTP request/response handling.
 - `src/presentation/routes/`: Express routes and authentication middleware.
 - `src/presentation/middlewares/`: request authentication and other HTTP middleware.
@@ -38,4 +40,4 @@ All transaction and reporting endpoints must scope results to the authenticated 
 
 ## Architecture roadmap
 
-Keep the existing MERN repositories and introduce new folders only when a real feature is implemented. Planned additions include account/category/budget/bill domain models and services, a dedicated `src/ai_engine/` module, bank statement import under `src/infrastructure/bank_sync/`, notifications, and security features. Bank synchronization requires a supported bank/Open Banking provider; it is not implemented by creating placeholder files.
+Keep the existing MERN repositories and introduce new folders only when a real feature is implemented. Planned additions include account/category/budget/bill domain models and services, report repositories under `src/infrastructure/database/repositories/`, bank statement import under `src/infrastructure/bank_sync/`, notifications, and security features. AI insight generation has been moved to `src/ai_engine/virtual_assistant.js`; classification, forecast, budget optimization, and anomaly detection remain planned features. Bank synchronization requires a supported bank/Open Banking provider; it is not implemented by creating placeholder files.
