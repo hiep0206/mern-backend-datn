@@ -1,6 +1,7 @@
 const virtualAssistant = require('../../ai_engine/virtual_assistant');
 
 exports.generateInsight = async (req, res) => {
+  // Hỗ trợ lấy ID từ nhiều cấu trúc payload token khác nhau
   const userId = req.user?.id || req.user?._id || req.user?.userId;
 
   if (!userId) {

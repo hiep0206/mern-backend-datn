@@ -23,10 +23,14 @@ const UserSchema = new mongoose.Schema({
     resetPasswordExpire: {
         type: Date
     },
-    // Chuẩn bị cho tính năng Nhóm IV.2 (Xác thực sinh trắc học) sau này
     isBiometricEnabled: {
         type: Boolean,
         default: false
+    },
+    // Bổ sung trường lưu trữ Hạn mức ngân sách
+    monthlyBudget: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

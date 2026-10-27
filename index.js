@@ -44,6 +44,12 @@ app.use(
   require('./src/presentation/routes/transaction_routes')
 );
 
+// Khai báo API Quản lý Mục tiêu (Goal)
+app.use(
+  '/api/goals',
+  require('./src/presentation/routes/goal_routes')
+);
+
 app.use(
   '/api/insights',
   require('./src/presentation/routes/ai_routes')
@@ -58,6 +64,11 @@ app.use(
 app.use(
   '/api/v1',
   require('./src/presentation/routes/api_v1')
+);
+
+app.use(
+  '/api/bills',
+  require('./src/presentation/routes/bill_routes')
 );
 
 // Khởi động server

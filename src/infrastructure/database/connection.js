@@ -2,11 +2,17 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    // Đã sửa thành MONGODB_URI để khớp hoàn toàn với file .env của bạn
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(` MongoDB Connected: ${conn.connection.host}`);
+    // Tự động nhận diện cả MONGO_URI và MONGODB_URI để chống lỗi undefined trên Render
+    const dbUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+    if (!dbUri) {
+        throw new Error("Không tìm thấy chuỗi kết nối Database trong biến môi trường!");
+    }
+
+    const conn = await mongoose.connect(dbUri);
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(` Lỗi kết nối Database: ${error.message}`);
+    console.error(`❌ Lỗi kết nối Database: ${error.message}`);
     process.exit(1);
   }
 };
